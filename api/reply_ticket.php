@@ -1,8 +1,5 @@
 <?php
-/**
- * Reply to Support Ticket
- * Admin sends reply to customer via email
- */
+
 
 require_once 'db.php';
 require_once 'mail_config.php';
@@ -26,7 +23,6 @@ if (!$ticket_id || !$reply_message) {
 }
 
 try {
-    // Get ticket details
     $stmt = $pdo->prepare("SELECT * FROM support_tickets WHERE ticket_id = ?");
     $stmt->execute([$ticket_id]);
     $ticket = $stmt->fetch();
@@ -36,11 +32,9 @@ try {
         exit;
     }
     
-    // Update ticket status to resolved
     $stmt = $pdo->prepare("UPDATE support_tickets SET status = 'Resolved' WHERE ticket_id = ?");
     $stmt->execute([$ticket_id]);
-    
-    // Prepare email
+
     $customer_email = $ticket['email'];
     $customer_name = $ticket['customer_name'];
     $subject = "Re: {$ticket['subject']} - QueueBank Support";
@@ -90,7 +84,6 @@ try {
     </html>
     ";
     
-    // Send email
     $email_sent = send_email($customer_email, $customer_name, $subject, $body);
     
     if ($email_sent) {
