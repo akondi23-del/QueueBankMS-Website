@@ -1,10 +1,5 @@
 <?php
-/**
- * Email Configuration for QueueBank MS
- * Uses Gmail SMTP with App Password
- */
 
-// Gmail SMTP Configuration
 define('SMTP_HOST', 'smtp.gmail.com');
 define('SMTP_PORT', 587);
 define('SMTP_USER', 'kondiamela@gmail.com');
@@ -12,7 +7,7 @@ define('SMTP_PASS', 'pvam bpke yzzo pviu');
 define('FROM_EMAIL', 'supportticket@queuebankms.com');
 define('FROM_NAME', 'QueueBank Support');
 
-// Function to send email
+
 function send_email($to_email, $to_name, $subject, $body, $is_html = true) {
     require_once 'PHPMailer/PHPMailer.php';
     require_once 'PHPMailer/SMTP.php';
@@ -21,7 +16,7 @@ function send_email($to_email, $to_name, $subject, $body, $is_html = true) {
     $mail = new PHPMailer\PHPMailer\PHPMailer();
     
     try {
-        // Server settings
+
         $mail->isSMTP();
         $mail->Host = SMTP_HOST;
         $mail->SMTPAuth = true;
@@ -30,17 +25,17 @@ function send_email($to_email, $to_name, $subject, $body, $is_html = true) {
         $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = SMTP_PORT;
         
-        // Recipients
+
         $mail->setFrom(SMTP_USER, FROM_NAME);
         $mail->addAddress($to_email, $to_name);
         $mail->addReplyTo(FROM_EMAIL, FROM_NAME);
         
-        // Content
+
         $mail->isHTML($is_html);
         $mail->Subject = $subject;
         $mail->Body = $body;
         
-        // Send
+
         $mail->send();
         return true;
     } catch (Exception $e) {
@@ -49,7 +44,7 @@ function send_email($to_email, $to_name, $subject, $body, $is_html = true) {
     }
 }
 
-// Simple fallback if PHPMailer not available (for testing)
+
 function send_email_simple($to_email, $subject, $body) {
     $headers = "From: " . FROM_EMAIL . "\r\n";
     $headers .= "Reply-To: " . FROM_EMAIL . "\r\n";
