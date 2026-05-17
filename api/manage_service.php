@@ -5,7 +5,7 @@ $data = json_decode(file_get_contents("php://input"), true);
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'POST') {
-    // Add service
+
     if (empty($data['name']) || empty($data['duration'])) {
         echo json_encode(["success" => false, "error" => "Name and duration are required"]);
         exit;
@@ -20,7 +20,7 @@ if ($method === 'POST') {
     echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
 
 } elseif ($method === 'DELETE') {
-    // Delete service
+
     $id = $data['id'] ?? '';
     if (!$id) {
         echo json_encode(["success" => false, "error" => "Service ID required"]);
