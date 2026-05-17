@@ -1,7 +1,5 @@
 <?php
-// ── Database Connection ────────────────────────────────
-// Make sure XAMPP is running (Apache + MySQL)
-// Create database "queuebank" in phpMyAdmin first
+
 
 $host = "localhost";
 $dbname = "queuebank";
@@ -18,7 +16,7 @@ try {
     exit;
 }
 
-// ── CORS Headers ───────────────────────────────────────
+
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
