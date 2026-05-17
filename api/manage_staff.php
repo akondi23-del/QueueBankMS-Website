@@ -17,7 +17,7 @@ if ($method === 'GET') {
             exit;
         }
     }
-    // Check unique employee_id
+
     $check = $pdo->prepare("SELECT id FROM staff WHERE employee_id = ?");
     $check->execute([$data['employee_id']]);
     if ($check->fetch()) {
@@ -36,7 +36,7 @@ if ($method === 'GET') {
     echo json_encode(["success" => true]);
 
 } elseif ($method === 'PUT') {
-    // Update role
+
     $id   = $data['id']   ?? '';
     $role = $data['role'] ?? '';
     if (!$id || !$role) { echo json_encode(["success" => false, "error" => "ID and role required"]); exit; }
