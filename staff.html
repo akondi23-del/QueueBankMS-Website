@@ -89,7 +89,6 @@ input:focus{border-color:var(--sage);background:white}
   </div>
 </nav>
 
-<!-- LOGIN -->
 <div id="login-wrap" class="login-wrap">
   <div class="login-card">
     <div style="font-size:3.5rem;margin-bottom:1rem">🧑‍💼</div>
@@ -102,7 +101,6 @@ input:focus{border-color:var(--sage);background:white}
   </div>
 </div>
 
-<!-- DASHBOARD -->
 <div id="dash-wrap" class="wrap" style="display:none">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
     <div>
@@ -112,7 +110,6 @@ input:focus{border-color:var(--sage);background:white}
     <button class="btn-logout" onclick="logout()">Sign Out</button>
   </div>
 
-  <!-- NAV TABS -->
   <div class="nav-tab" style="margin-bottom:2rem">
     <button class="tab-btn active" onclick="showPage('today',this)">📅 Today's Schedule</button>
     <button class="tab-btn" onclick="showPage('pending',this)">⏳ Pending</button>
@@ -121,7 +118,6 @@ input:focus{border-color:var(--sage);background:white}
     <button class="tab-btn" onclick="showPage('stats',this)">📊 Performance</button>
   </div>
 
-  <!-- TODAY'S SCHEDULE PAGE -->
   <div id="page-today" class="page active">
     <div class="page-head"><h2>Today's Schedule</h2><p>All appointments scheduled for today</p></div>
     <div class="kpi-grid" id="today-kpi"></div>
@@ -134,7 +130,6 @@ input:focus{border-color:var(--sage);background:white}
     </div>
   </div>
 
-  <!-- PENDING PAGE -->
   <div id="page-pending" class="page">
     <div class="page-head"><h2>Pending Appointments</h2><p>Appointments waiting to be processed</p></div>
     <div class="table-wrap">
@@ -146,7 +141,6 @@ input:focus{border-color:var(--sage);background:white}
     </div>
   </div>
 
-  <!-- COMPLETED PAGE -->
   <div id="page-completed" class="page">
     <div class="page-head"><h2>Completed Appointments</h2><p>History of finished appointments</p></div>
     <div class="kpi-grid" id="completed-kpi"></div>
@@ -159,13 +153,11 @@ input:focus{border-color:var(--sage);background:white}
     </div>
   </div>
 
-  <!-- PROFILE PAGE -->
   <div id="page-profile" class="page">
     <div class="page-head"><h2>My Profile</h2><p>Your staff information</p></div>
     <div class="profile-card" id="profile-card"></div>
   </div>
 
-  <!-- PERFORMANCE PAGE -->
   <div id="page-stats" class="page">
     <div class="page-head"><h2>Performance Dashboard</h2><p>Your appointment statistics</p></div>
     <div class="kpi-grid" id="stats-kpi"></div>
