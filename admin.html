@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QueueBank MS — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--sage:#7cb987;--teal:#5aab9e;--cream:#fdf8f0;--mint:#b8e8cc;--sage-pale:#e8f5eb;--sage-light:#a8d5b0;--sky:#d0eef8;--peach:#fde0cc;--coral:#f0a080;--text-dark:#2d4a35;--text-soft:#7a9e82;--text-mid:#4a7055;--shadow:0 8px 32px rgba(90,171,158,0.15);--radius:14px;--radius-lg:24px;--font-h:'Playfair Display',serif;--font-b:'Nunito',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-b);background:var(--cream);color:var(--text-dark);min-height:100vh}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:68px;background:rgba(253,248,240,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(124,185,135,0.2)}
+.logo-text{font-family:var(--font-h);font-size:1.1rem;color:var(--text-dark)}
+.logo-text span{color:var(--coral)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-links{display:flex;align-items:center;gap:8px}
+.nav-a{font-size:0.85rem;font-weight:700;padding:8px 15px;border-radius:10px;color:var(--text-mid);text-decoration:none}
+.nav-a:hover{background:var(--sage-pale);color:var(--teal)}
+.admin-badge{background:#fde0d0;color:#c06030;border:2px solid var(--coral);padding:5px 14px;border-radius:50px;font-size:0.78rem;font-weight:800}
+/* LOGIN */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 68px)}
+.login-card{background:white;border:2px solid #f0c0a0;border-radius:var(--radius-lg);padding:3rem;width:min(440px,100%);box-shadow:var(--shadow);text-align:center}
+.login-card h2{font-family:var(--font-h);font-size:1.8rem;margin-bottom:0.5rem}
+.login-card p{color:var(--text-soft);font-size:0.9rem;margin-bottom:2rem;line-height:1.6}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;text-align:left}
+.fg.full{grid-column:1/-1}
+label{font-size:0.73rem;font-weight:800;color:var(--text-mid);letter-spacing:0.05em;text-transform:uppercase}
+input,select,textarea{background:var(--cream);border:2px solid #d4f0df;color:var(--text-dark);padding:11px 14px;border-radius:10px;font-size:0.9rem;font-family:var(--font-b);outline:none;transition:0.2s;width:100%}
+input:focus,select:focus{border-color:var(--sage);background:white}
+.btn{font-family:var(--font-b);font-weight:800;font-size:0.9rem;padding:12px 26px;border-radius:50px;border:none;cursor:pointer;transition:0.2s}
+.btn-admin{background:linear-gradient(135deg,var(--coral),var(--peach));color:white;width:100%;box-shadow:0 4px 14px rgba(240,160,128,0.35)}
+.btn-admin:hover{transform:translateY(-2px)}
+.btn-teal{background:linear-gradient(135deg,var(--teal),var(--sage));color:white}
+.btn-teal:hover{transform:translateY(-1px)}
+.btn-danger{background:#fde8f0;color:#c06080;border:2px solid #f0c0d0}
+.btn-sm{width:auto;font-size:0.78rem;padding:7px 16px}
+.hint{font-size:0.74rem;color:var(--text-soft);margin-top:0.75rem}
+/* LAYOUT */
+.admin-layout{display:flex;min-height:calc(100vh - 68px)}
+.sidebar{width:220px;flex-shrink:0;background:white;border-right:2px solid #d4f0df;padding:1.5rem 1rem;display:flex;flex-direction:column;gap:4px;position:sticky;top:68px;height:calc(100vh - 68px);overflow-y:auto}
+.sb-section{font-size:0.68rem;font-weight:800;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.08em;padding:1rem 0.75rem 0.5rem;margin-top:0.5rem}
+.sb-btn{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:none;background:transparent;color:var(--text-mid);font-family:var(--font-b);font-size:0.85rem;font-weight:700;cursor:pointer;transition:0.2s;width:100%;text-align:left}
+.sb-btn:hover{background:var(--sage-pale);color:var(--teal)}
+.sb-btn.active{background:var(--sage-pale);color:var(--teal);border:2px solid var(--sage-light)}
+.main{flex:1;padding:2.5rem 2rem 5rem;overflow-x:hidden}
+.panel{display:none}.panel.active{display:block}
+/* SECTION HEADER */
+.sec-tag{font-size:0.74rem;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.4rem}
+.sec-head{margin-bottom:2rem}
+.sec-head h2{font-family:var(--font-h);font-size:1.8rem;margin-bottom:0.35rem}
+.sec-head p{color:var(--text-soft);font-size:0.9rem}
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:2rem}
+.kpi{background:white;border:2px solid #d4f0df;border-radius:var(--radius-lg);padding:1.4rem;position:relative;overflow:hidden;transition:0.25s}
+.kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.kpi.k1::before{background:linear-gradient(90deg,var(--sage),var(--teal))}
+.kpi.k2::before{background:linear-gradient(90deg,#f7c5a0,#e08050)}
+.kpi.k3::before{background:linear-gradient(90deg,var(--teal),var(--sky))}
+.kpi.k4::before{background:linear-gradient(90deg,#d0a0e0,#c090d0)}
+.kpi.k5::before{background:linear-gradient(90deg,var(--mint),var(--sage))}
+.kpi h4{font-size:0.7rem;font-weight:800;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.65rem}
+.kpi-num{font-family:var(--font-h);font-size:2rem;color:var(--text-dark)}
+.kpi-sub{font-size:0.73rem;color:var(--text-soft);margin-top:2px}
+/* TABLES */
+.table-wrap{background:white;border:2px solid #d4f0df;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:2rem}
+.tw-head{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.5rem;border-bottom:2px solid #d4f0df;flex-wrap:wrap;gap:0.75rem}
+.tw-head h3{font-family:var(--font-h);font-size:1rem}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 14px;font-size:0.68rem;font-weight:800;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.07em;text-align:left;background:var(--sage-pale);border-bottom:2px solid var(--sage-light)}
+td{padding:12px 14px;font-size:0.83rem;border-bottom:1px solid rgba(168,213,176,0.25);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(232,245,235,0.5)}
+.badge{padding:4px 11px;border-radius:50px;font-size:0.68rem;font-weight:800;display:inline-block}
+.b-confirmed{background:#e8f5eb;color:var(--sage)}
+.b-completed{background:#d0eef8;color:#4080b0}
+.b-cancelled{background:#fde0cc;color:#c06040}
+.b-noshow,.b-no-show{background:#fde8f0;color:#c06080}
+.act-btns{display:flex;gap:5px;flex-wrap:wrap}
+.abtn{font-family:var(--font-b);font-size:0.72rem;font-weight:800;padding:5px 11px;border-radius:50px;border:2px solid;cursor:pointer;transition:0.2s}
+.ab-done{border-color:var(--sage-light);color:var(--teal);background:var(--sage-pale)}
+.ab-done:hover{background:var(--mint)}
+.ab-ns{border-color:#f0c0d0;color:#c06080;background:#fde8f0}
+.ab-ns:hover{background:#f8d0e0}
+.ab-del{border-color:#f0d0c0;color:#c08060;background:#fde8d8}
+/* STAFF CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.1rem;margin-bottom:2rem}
+.person-card{background:white;border:2px solid #d4f0df;border-radius:var(--radius-lg);padding:1.5rem;transition:0.25s}
+.person-card:hover{border-color:var(--sage-light);box-shadow:var(--shadow)}
+.person-top{display:flex;align-items:center;gap:1rem;margin-bottom:0.75rem}
+.person-avatar{width:48px;height:48px;border-radius:50%;background:var(--sky);display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-family:var(--font-h);font-weight:800;color:var(--teal);flex-shrink:0}
+.person-name{font-family:var(--font-h);font-size:0.95rem;font-weight:700;margin-bottom:2px}
+.person-id{font-size:0.75rem;color:var(--text-soft)}
+.person-role{font-weight:800;color:var(--teal);font-size:0.85rem;margin-bottom:2px}
+.person-email{font-size:0.78rem;color:var(--text-soft);margin-bottom:0.75rem}
+/* ADD FORM */
+.add-form{background:white;border:2px solid var(--sage-light);border-radius:var(--radius-lg);padding:2rem;margin-bottom:2rem}
+.add-form h3{font-family:var(--font-h);font-size:1.1rem;margin-bottom:1.5rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+@media(max-width:560px){.form-row{grid-template-columns:1fr}}
+.form-actions{display:flex;gap:0.75rem;margin-top:1rem}
+/* SERVICES */
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;margin-bottom:2rem}
+.svc-card{background:white;border:2px solid #d4f0df;border-radius:var(--radius-lg);padding:1.4rem;transition:0.25s}
+.svc-card:hover{border-color:var(--sage-light);box-shadow:var(--shadow)}
+.svc-icon-big{font-size:2rem;margin-bottom:0.75rem}
+.svc-card h4{font-family:var(--font-h);font-size:0.95rem;margin-bottom:0.3rem}
+.svc-card p{font-size:0.78rem;color:var(--text-soft);margin-bottom:0.75rem}
+.dur-badge{background:var(--mint);color:var(--teal);font-size:0.72rem;font-weight:800;padding:3px 10px;border-radius:50px}
+/* TOAST */
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text-dark);color:white;border-radius:50px;padding:12px 24px;font-size:0.85rem;font-weight:700;z-index:300;opacity:0;transition:0.3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(45,74,53,0.35);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:0.2s;backdrop-filter:blur(4px)}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:white;border:2px solid var(--sage-light);border-radius:var(--radius-lg);padding:2rem;max-width:380px;width:100%}
+.modal h3{font-family:var(--font-h);font-size:1.15rem;margin-bottom:0.6rem}
+.modal p{font-size:0.87rem;color:var(--text-soft);margin-bottom:1.4rem;line-height:1.6}
+.modal-btns{display:flex;gap:0.75rem;justify-content:flex-end}
+.btn-ghost{background:var(--sage-pale);color:var(--teal);border:2px solid var(--sage-light)}
+.btn-primary{background:linear-gradient(135deg,var(--teal),var(--sage));color:white;border:none}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="index.html">
+    <div style="width:38px;height:38px;background:linear-gradient(135deg,var(--coral),var(--teal));border-radius:11px;display:flex;align-items:center;justify-content:center">
+      <svg width="22" height="22" viewBox="0 0 40 40"><circle cx="19" cy="21" r="12" fill="white"/><line x1="19" y1="21" x2="19" y2="13" stroke="#c06040" stroke-width="2.5" stroke-linecap="round"/><line x1="19" y1="21" x2="25" y2="21" stroke="#c06040" stroke-width="2.5" stroke-linecap="round"/><circle cx="32" cy="9" r="7" fill="#f0a080"/><polyline points="28,9 31,12 37,5" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="logo-text">Queue<span>Bank</span> MS</div>
+  </a>
+  <div class="nav-links">
+    <span class="admin-badge">🛡️ Admin Panel</span>
+    <a class="nav-a" href="user.html">User Portal</a>
+    <a class="nav-a" href="staff.html">Staff</a>
+    <a class="nav-a" href="index.html">← Home</a>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div id="login-wrap" class="login-wrap">
+  <div class="login-card">
+    <div style="width:64px;height:64px;background:linear-gradient(135deg,var(--coral),var(--teal));border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem">
+      <svg width="38" height="38" viewBox="0 0 40 40"><circle cx="19" cy="21" r="12" fill="white"/><line x1="19" y1="21" x2="19" y2="13" stroke="#c06040" stroke-width="2.5" stroke-linecap="round"/><line x1="19" y1="21" x2="25" y2="21" stroke="#c06040" stroke-width="2.5" stroke-linecap="round"/><circle cx="32" cy="9" r="7" fill="#f0a080"/><polyline points="28,9 31,12 37,5" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <h2>Admin Login</h2>
+    <p>System administrator access only.</p>
+    <div class="fg"><label>Username</label><input id="a-user" placeholder="admin" value="admin"></div>
+    <div class="fg"><label>Password</label><input id="a-pw" type="password" placeholder="Enter password" value="admin123"></div>
+    <button class="btn btn-admin" onclick="login()">🛡️ Enter Admin Panel</button>
+    <p class="hint">Demo: admin / admin123</p>
+  </div>
+</div>
+
+<!-- ADMIN LAYOUT -->
+<div id="admin-layout" class="admin-layout" style="display:none">
+  <aside class="sidebar">
+    <div class="sb-section">Overview</div>
+    <button class="sb-btn active" onclick="showPanel('overview',this)"><span>📊</span> Dashboard</button>
+    <button class="sb-btn" onclick="showPanel('bookings',this)"><span>📅</span> All Bookings</button>
+    <div class="sb-section">Management</div>
+    <button class="sb-btn" onclick="showPanel('staff',this)"><span>👤</span> Staff Members</button>
+    <button class="sb-btn" onclick="showPanel('services',this)"><span>🏦</span> Services</button>
+    <button class="sb-btn" onclick="showPanel('tickets',this)"><span>🎫</span> Support Tickets</button> 
+    <div class="sb-section">System</div>
+    <button class="sb-btn" onclick="showPanel('tickets',this)"><span>🎫</span> Support Tickets</button>
+    <div style="margin-top:auto;padding-top:1rem">
+      <button class="sb-btn" onclick="logout()" style="color:#c06080"><span>🚪</span> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- OVERVIEW -->
+    <div class="panel active" id="panel-overview">
+      <div class="sec-head">
+        <div class="sec-tag">📊 System Overview</div>
+        <h2>Admin Dashboard</h2>
+        <p id="ov-date"></p>
+      </div>
+      <div class="kpi-grid" id="ov-kpis"></div>
+      <div style="background:linear-gradient(135deg,var(--sage-pale),var(--sky));border:2px solid var(--sage-light);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:2rem">
+        <h3 style="font-family:var(--font-h);font-size:1rem;margin-bottom:1rem">⚡ Quick Actions</h3>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+          <button class="btn btn-teal btn-sm" onclick="showPanel('bookings',null)">View All Bookings</button>
+          <button class="btn btn-ghost btn-sm" onclick="showPanel('staff',null)">Manage Staff</button>
+          <button class="btn btn-ghost btn-sm" onclick="showPanel('services',null)">Edit Services</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL BOOKINGS -->
+    <div class="panel" id="panel-bookings">
+      <div class="sec-head">
+        <div class="sec-tag">📅 Appointments</div>
+        <h2>All Bookings</h2>
+        <p>View, filter, and manage every appointment in the system.</p>
+      </div>
+      <div class="table-wrap">
+        <div class="tw-head">
+          <h3>Booking Records</h3>
+          <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap">
+            <input style="width:auto;padding:8px 14px;border-radius:50px;border:2px solid #d4f0df;background:var(--cream);font-family:var(--font-b);font-size:0.82rem;outline:none" id="bk-search" placeholder="🔍 Search..." oninput="renderBkTable()">
+            <select id="bk-filter" onchange="renderBkTable()" style="width:auto;padding:8px 14px;border-radius:50px;border:2px solid #d4f0df;background:var(--cream)">
+              <option>All Statuses</option><option>Confirmed</option><option>Completed</option><option>Cancelled</option><option>No-show</option>
+            </select>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table><thead><tr><th>Code</th><th>Name</th><th>Email</th><th>Service</th><th>Date</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="bk-body"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAFF -->
+    <div class="panel" id="panel-staff">
+      <div class="sec-head">
+        <div class="sec-tag">👤 Staff</div>
+        <h2>Staff Members</h2>
+        <p>Add, edit, and manage bank employee accounts.</p>
+      </div>
+      <div class="add-form">
+        <h3>➕ Add New Staff Member</h3>
+        <div class="form-row">
+          <div class="fg"><label>Full Name *</label><input id="sf-name" placeholder="e.g. Arta Hoxha"></div>
+          <div class="fg"><label>Employee ID *</label><input id="sf-id" placeholder="e.g. EMP007"></div>
+          <div class="fg"><label>Email *</label><input id="sf-email" type="email" placeholder="emp@bank.al"></div>
+          <div class="fg"><label>Password *</label><input id="sf-pass" type="password" placeholder="Set a password"></div>
+          <div class="fg"><label>Role</label>
+            <select id="sf-role"><option>Teller</option><option>Senior Teller</option><option>Loans Officer</option><option>Supervisor</option></select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-teal btn-sm" onclick="addStaff()">Add Staff Member</button>
+        </div>
+      </div>
+      <div class="cards-grid" id="staff-cards"></div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="panel" id="panel-services">
+      <div class="sec-head">
+        <div class="sec-tag">🏦 Services</div>
+        <h2>Banking Services</h2>
+        <p>Manage the services available for booking.</p>
+      </div>
+      <div class="svc-grid" id="svc-mgmt-grid"></div>
+      <div class="add-form">
+        <h3>➕ Add New Service</h3>
+        <div class="form-row">
+          <div class="fg"><label>Service Name *</label><input id="ns-name" placeholder="e.g. Foreign Currency"></div>
+          <div class="fg"><label>Icon keyword</label><input id="ns-icon" placeholder="e.g. bank, loan, card"></div>
+          <div class="fg"><label>Duration (min) *</label><input id="ns-dur" type="number" placeholder="30" min="5" max="120"></div>
+          <div class="fg"><label>Description</label><input id="ns-desc" placeholder="Brief service description..."></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-teal btn-sm" onclick="addService()">Add Service</button>
+        </div>
+      </div>
+    </div>
+
+<!-- TICKETS MANAGEMENT -->
+<div class="panel" id="panel-tickets">
+  <div class="sec-head">
+    <div class="sec-tag">🎫 Support</div>
+    <h2>Support Tickets</h2>
+    <p>View and respond to customer support requests.</p>
+  </div>
+  <div class="table-wrap">
+    <div class="tw-head">
+      <h3>All Support Tickets</h3>
+      <input style="width:auto;padding:8px 14px;border-radius:50px;border:2px solid #d4f0df;background:var(--cream);font-family:var(--font-b);font-size:0.82rem;outline:none" id="tk-search" placeholder="🔍 Search..." oninput="renderTickets()">
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Ticket ID</th>
+            <th>Customer</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="tk-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Reply Modal -->
+  <div class="modal-bg" id="reply-modal">
+    <div class="modal">
+      <h3>Reply to Support Ticket</h3>
+      <div style="margin-bottom:1rem">
+        <p style="color:var(--text-soft);font-size:0.85rem;margin-bottom:0.5rem" id="tk-detail-head"></p>
+        <div style="background:var(--sage-pale);padding:1rem;border-radius:8px;margin-bottom:1rem">
+          <p style="font-size:0.82rem;color:var(--text-mid);line-height:1.6" id="tk-detail-msg"></p>
+        </div>
+      </div>
+      <div style="margin-bottom:1rem">
+        <label style="font-size:0.72rem;font-weight:800;color:var(--text-mid);text-transform:uppercase;display:block;margin-bottom:0.5rem">Your Reply</label>
+        <textarea id="reply-msg" rows="5" placeholder="Type your response to the customer..." style="width:100%;padding:10px;border:2px solid #d4f0df;border-radius:8px;font-family:var(--font-b);font-size:0.9rem;outline:none;resize:vertical"></textarea>
+      </div>
+      <div class="modal-btns">
+        <button class="btn btn-ghost btn-sm" onclick="closeReplyModal()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="sendReply()">Send Reply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let allTickets = [];
+let currentTicketId = null;
+
+function renderTickets() {
+  const q = (document.getElementById('tk-search') || {}).value || '';
+  let list = allTickets;
+  if (q) {
+    const ql = q.toLowerCase();
+    list = list.filter(t => t.ticket_id?.toLowerCase().includes(ql) || t.customer_name?.toLowerCase().includes(ql) || t.subject?.toLowerCase().includes(ql));
+  }
+  list.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+  
+  const body = document.getElementById('tk-body');
+  if (!list.length) {
+    body.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-soft)">No support tickets.</td></tr>`;
+    return;
+  }
+  
+  body.innerHTML = list.map(t => `
+    <tr>
+      <td><strong style="color:var(--teal)">${t.ticket_id}</strong></td>
+      <td><strong>${t.customer_name}</strong><br><span style="font-size:0.75rem;color:var(--text-soft)">${t.email}</span></td>
+      <td>${t.subject}</td>
+      <td><span class="badge ${t.status === 'Open' ? 'b-confirmed' : t.status === 'In Progress' ? 'b-completed' : 'b-noshow'}">${t.status}</span></td>
+      <td style="font-size:0.78rem">${new Date(t.created_at).toLocaleDateString('en-GB')}</td>
+      <td><button class="abtn ab-done" onclick="openReplyModal('${t.ticket_id}', '${t.customer_name}', '${t.subject}', '${t.message.replace(/'/g, "\\'")}')">Reply</button></td>
+    </tr>`).join('');
+}
+
+function openReplyModal(id, name, subject, msg) {
+  currentTicketId = id;
+  document.getElementById('tk-detail-head').textContent = `To: ${name} | Subject: ${subject}`;
+  document.getElementById('tk-detail-msg').textContent = msg;
+  document.getElementById('reply-msg').value = '';
+  document.getElementById('reply-modal').classList.add('open');
+}
+
+function closeReplyModal() {
+  document.getElementById('reply-modal').classList.remove('open');
+  currentTicketId = null;
+}
+
+async function sendReply() {
+  const msg = document.getElementById('reply-msg').value.trim();
+  if (!msg) {
+    toast('Please enter a reply message');
+    return;
+  }
+  
+  try {
+    const r = await fetch(API + '/reply_ticket.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ticket_id: currentTicketId, reply_message: msg, admin_name: 'QueueBank Admin'})
+    });
+    const d = await r.json();
+    if (d.success) {
+      closeReplyModal();
+      await loadTickets();
+      renderTickets();
+      toast('✅ Reply sent to customer');
+    } else {
+      toast(d.error || 'Failed to send reply');
+    }
+  } catch(e) {
+    toast('Connection error');
+  }
+}
+</script>
+
+
+
+  </main>
+</div>
+
+<div class="modal-bg" id="clear-modal">
+  <div class="modal">
+    <h3>⚠️ Remove Staff Member?</h3>
+    <p>This will permanently remove this staff member. Are you sure?</p>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="doRemove()">Yes, Remove</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'api';
+const ICONS = {bank:'🏦',loan:'💰',card:'💳',transfer:'💸',invest:'📈',support:'🛠️'};
+let bks = [], staffList = [], services = [];
+let removeId = null;
+
+function login() {
+  const u = document.getElementById('a-user').value.trim();
+  const p = document.getElementById('a-pw').value.trim();
+  if (u === 'admin' && p === 'admin123') {
+    document.getElementById('login-wrap').style.display = 'none';
+    document.getElementById('admin-layout').style.display = 'flex';
+    refresh();
+  } else {
+    toast('Invalid admin credentials');
+  }
+}
+
+function logout() {
+  document.getElementById('login-wrap').style.display = 'flex';
+  document.getElementById('admin-layout').style.display = 'none';
+}
+
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'tickets') {
+    loadTickets().then(() => renderTickets());
+  } else {
+    refresh();
+  }
+}
+
+async function refresh() {
+  document.getElementById('ov-date').textContent =
+    new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  await loadBks(); await loadStaff(); await loadServices(); await loadTickets();
+  renderOverview(); renderBkTable(); renderStaffCards(); renderSvcGrid(); renderTickets();
+}
+
+async function loadBks() {
+  try { const r = await fetch(API+'/get_bookings.php'); const d = await r.json(); if(d.success) bks=d.bookings; } catch(e){}
+}
+async function loadStaff() {
+  try { const r = await fetch(API+'/manage_staff.php'); const d = await r.json(); if(d.success) staffList=d.staff; } catch(e){}
+}
+async function loadServices() {
+  try { const r = await fetch(API+'/get_services.php'); const d = await r.json(); if(d.success) services=d.services; } catch(e){}
+}
+async function loadTickets() {
+  try { const r = await fetch(API+'/manage_tickets.php'); const d = await r.json(); if(d.success) { window._tickets=d.tickets; allTickets=d.tickets; } } catch(e){}
+}
+
+function renderOverview() {
+  const t=bks.length, cf=bks.filter(b=>b.status==='Confirmed').length,
+    cp=bks.filter(b=>b.status==='Completed').length,
+    ns=bks.filter(b=>b.status==='No-show').length;
+  document.getElementById('ov-kpis').innerHTML = `
+    <div class="kpi k1"><h4>Total Bookings</h4><div class="kpi-num">${t}</div><div class="kpi-sub">All time</div></div>
+    <div class="kpi k2"><h4>Confirmed</h4><div class="kpi-num">${cf}</div><div class="kpi-sub">Upcoming</div></div>
+    <div class="kpi k3"><h4>Completed</h4><div class="kpi-num">${cp}</div><div class="kpi-sub">Served</div></div>
+    <div class="kpi k4"><h4>No-shows</h4><div class="kpi-num">${ns}</div><div class="kpi-sub">Missed</div></div>
+    <div class="kpi k5"><h4>Staff</h4><div class="kpi-num">${staffList.length}</div><div class="kpi-sub">Members</div></div>`;
+}
+
+function fmtDate(d) { if(!d) return '—'; return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+
+function renderBkTable() {
+  const q=(document.getElementById('bk-search')||{}).value||'';
+  const f=(document.getElementById('bk-filter')||{}).value||'All Statuses';
+  let list=bks.filter(b=>f==='All Statuses'||b.status===f);
+  if(q){const ql=q.toLowerCase();list=list.filter(b=>b.code?.toLowerCase().includes(ql)||b.first_name?.toLowerCase().includes(ql)||b.service_name?.toLowerCase().includes(ql));}
+  list.sort((a,b)=>(b.created_at||'').localeCompare(a.created_at||''));
+  const body=document.getElementById('bk-body');
+  if(!list.length){body.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:2.5rem;color:var(--text-soft)">No bookings found.</td></tr>`;return;}
+  body.innerHTML=list.map(b=>`
+    <tr>
+      <td><strong style="color:var(--teal);font-family:var(--font-h)">${b.code}</strong></td>
+      <td>${b.first_name} ${b.last_name}</td>
+      <td style="font-size:0.78rem">${b.email}</td>
+      <td>${ICONS[b.service_icon]||'🏦'} ${b.service_name}</td>
+      <td>${fmtDate(b.date)}</td>
+      <td><strong>${b.slot}</strong></td>
+      <td><span class="badge b-${(b.status||'').toLowerCase().replace(/[\s-]/g,'')}">${b.status}</span></td>
+      <td>
+        <div class="act-btns">
+          ${b.status==='Confirmed'?`<button class="abtn ab-done" onclick="setStatus('${b.code}','Completed')">✓</button><button class="abtn ab-ns" onclick="setStatus('${b.code}','No-show')">✗</button>`:''}
+          <button class="abtn ab-del" onclick="deleteBk('${b.code}')">🗑</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+async function setStatus(code,status) {
+  try{const r=await fetch(API+'/update_status.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,status})});const d=await r.json();if(d.success){const b=bks.find(x=>x.code===code);if(b)b.status=status;renderOverview();renderBkTable();toast(`✅ ${code} → ${status}`);}else toast(d.error||'Failed');}catch(e){toast('Connection error');}
+}
+
+async function deleteBk(code) {
+  try{const r=await fetch(API+'/cancel_booking.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});const d=await r.json();if(d.success){bks=bks.filter(b=>b.code!==code);renderOverview();renderBkTable();toast('🗑️ Booking deleted');}else toast(d.error||'Failed');}catch(e){toast('Connection error');}
+}
+
+function renderStaffCards() {
+  const grid = document.getElementById('staff-cards');
+  if (!staffList.length) { grid.innerHTML = '<p style="color:var(--text-soft)">No staff members yet.</p>'; return; }
+  grid.innerHTML = staffList.map(s => `
+    <div class="person-card">
+      <div class="person-top">
+        <div class="person-avatar">${s.name.charAt(0)}</div>
+        <div>
+          <div class="person-name">${s.name}</div>
+          <div class="person-id">${s.employee_id}</div>
+        </div>
+      </div>
+      <div class="person-role">${s.role}</div>
+      <div class="person-email">${s.email}</div>
+      <div style="display:flex;gap:0.5rem;align-items:center">
+        <select onchange="updateRole(${s.id},this.value)" style="flex:1;padding:7px 10px;border-radius:8px;border:2px solid #d4f0df;font-size:0.82rem;font-family:var(--font-b);background:var(--cream)">
+          <option value="Teller" ${s.role==='Teller'?'selected':''}>Teller</option>
+          <option value="Senior Teller" ${s.role==='Senior Teller'?'selected':''}>Senior Teller</option>
+          <option value="Loans Officer" ${s.role==='Loans Officer'?'selected':''}>Loans Officer</option>
+          <option value="Supervisor" ${s.role==='Supervisor'?'selected':''}>Supervisor</option>
+        </select>
+        <button onclick="confirmRemove(${s.id})" style="background:#fde8f0;border:2px solid #f0c0d0;color:#c06080;padding:7px 12px;border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:800;font-family:var(--font-b)">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addStaff() {
+  const name=document.getElementById('sf-name').value.trim();
+  const id=document.getElementById('sf-id').value.trim();
+  const email=document.getElementById('sf-email').value.trim();
+  const pass=document.getElementById('sf-pass').value.trim();
+  const role=document.getElementById('sf-role').value;
+  if(!name||!id||!email||!pass){toast('Please fill in all required fields');return;}
+  try{
+    const r=await fetch(API+'/manage_staff.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:id,name,email,password:pass,role})});
+    const d=await r.json();
+    if(d.success){['sf-name','sf-id','sf-email','sf-pass'].forEach(i=>document.getElementById(i).value='');await loadStaff();renderStaffCards();toast('✅ Staff member added!');}
+    else toast(d.error||'Failed to add staff');
+  }catch(e){toast('Connection error');}
+}
+
+async function updateRole(id,role) {
+  try{
+    const r=await fetch(API+'/manage_staff.php',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,role})});
+    const d=await r.json();
+    if(d.success){const s=staffList.find(x=>x.id==id);if(s)s.role=role;renderStaffCards();toast('✅ Role updated to '+role);}
+    else toast(d.error||'Failed');
+  }catch(e){toast('Connection error');}
+}
+
+function confirmRemove(id){removeId=id;document.getElementById('clear-modal').classList.add('open');}
+function closeModal(){document.getElementById('clear-modal').classList.remove('open');removeId=null;}
+async function doRemove(){
+  if(!removeId)return;
+  try{const r=await fetch(API+'/manage_staff.php',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:removeId})});const d=await r.json();closeModal();if(d.success){staffList=staffList.filter(s=>s.id!=removeId);renderStaffCards();toast('🗑️ Staff member removed.');}else toast(d.error||'Failed');}catch(e){toast('Connection error');}
+}
+
+function renderSvcGrid() {
+  const grid=document.getElementById('svc-mgmt-grid');
+  grid.innerHTML=services.map((s,i)=>`
+    <div class="svc-card">
+      <div class="svc-icon-big">${ICONS[s.icon]||'🏦'}</div>
+      <h4>${s.name}</h4>
+      <p>${s.description}</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.75rem">
+        <span class="dur-badge">⏱ ${s.duration} min</span>
+        <button onclick="removeSvc(${s.id})" style="background:#fde8d8;border:none;color:#c08060;padding:5px 10px;border-radius:8px;cursor:pointer;font-size:0.75rem;font-weight:800;font-family:var(--font-b)">🗑 Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addService(){
+  const name=document.getElementById('ns-name').value.trim();
+  const icon=document.getElementById('ns-icon').value.trim()||'bank';
+  const dur=parseInt(document.getElementById('ns-dur').value)||30;
+  const desc=document.getElementById('ns-desc').value.trim()||'Banking service';
+  if(!name){toast('Please enter a service name');return;}
+  try{const r=await fetch(API+'/manage_service.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({icon,name,description:desc,duration:dur})});const d=await r.json();if(d.success){['ns-name','ns-icon','ns-dur','ns-desc'].forEach(i=>document.getElementById(i).value='');await loadServices();renderSvcGrid();toast('✅ Service added!');}else toast(d.error||'Failed');}catch(e){toast('Connection error');}
+}
+
+async function removeSvc(id){
+  try{const r=await fetch(API+'/manage_service.php',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});const d=await r.json();if(d.success){await loadServices();renderSvcGrid();toast('🗑️ Service removed.');}else toast(d.error||'Failed');}catch(e){toast('Connection error');}
+}
+
+
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.className='show';clearTimeout(t._t);t._t=setTimeout(()=>t.className='',3000);}
+
+</script>
+</body>
+</html>

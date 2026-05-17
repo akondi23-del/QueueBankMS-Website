@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QueueBank MS — Smart Bank Appointments</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--sage:#7cb987;--teal:#5aab9e;--cream:#fdf8f0;--mint:#b8e8cc;--sage-pale:#e8f5eb;--sage-light:#a8d5b0;--peach:#f7c5a0;--sky:#d0eef8;--text-dark:#2d4a35;--text-soft:#7a9e82;--text-mid:#4a7055;--shadow:0 8px 32px rgba(90,171,158,0.15);--radius:14px;--radius-lg:24px;--font-h:'Playfair Display',serif;--font-b:'Nunito',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-b);background:var(--cream);color:var(--text-dark);overflow-x:hidden}
+.blob-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.3}
+.b1{width:600px;height:600px;background:var(--mint);top:-200px;left:-150px}
+.b2{width:500px;height:500px;background:var(--sky);top:30%;right:-200px}
+.b3{width:400px;height:400px;background:var(--peach);bottom:-100px;left:30%}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1.5rem,5vw,5rem);height:70px;background:rgba(253,248,240,0.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(124,185,135,0.2)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--sage),var(--teal));border-radius:12px;display:flex;align-items:center;justify-content:center}
+.logo-text{font-family:var(--font-h);font-size:1.15rem;color:var(--text-dark)}
+.logo-text span{color:var(--teal)}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-a{font-size:0.88rem;font-weight:700;padding:8px 16px;border-radius:10px;color:var(--text-mid);text-decoration:none;transition:0.2s}
+.nav-a:hover{background:var(--sage-pale);color:var(--teal)}
+.nav-cta{background:linear-gradient(135deg,var(--sage),var(--teal));color:white!important;padding:9px 22px;border-radius:50px;font-weight:700;box-shadow:0 4px 14px rgba(90,171,158,0.35)}
+.nav-cta:hover{transform:translateY(-2px)}
+.hero{position:relative;z-index:1;padding:clamp(4rem,10vh,8rem) clamp(1.5rem,5vw,5rem) 3rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;max-width:1200px;margin:0 auto}
+@media(max-width:768px){.hero{grid-template-columns:1fr;gap:2rem;text-align:center}}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--sage-pale);border:1px solid var(--sage-light);border-radius:50px;padding:6px 16px;font-size:0.75rem;font-weight:700;color:var(--teal);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5rem}
+.hero-dot{width:7px;height:7px;border-radius:50%;background:var(--sage);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero h1{font-family:var(--font-h);font-size:clamp(2.4rem,5.5vw,4rem);line-height:1.1;margin-bottom:1.25rem}
+.hero h1 em{font-style:normal;color:var(--teal)}
+.hero p{font-size:1rem;color:var(--text-soft);line-height:1.75;margin-bottom:2.5rem;font-weight:500}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+@media(max-width:768px){.hero-btns{justify-content:center}}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-b);font-weight:700;font-size:0.95rem;padding:13px 28px;border-radius:50px;border:none;cursor:pointer;transition:0.25s;text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,var(--sage),var(--teal));color:white;box-shadow:0 6px 20px rgba(90,171,158,0.35)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(90,171,158,0.45)}
+.btn-outline{background:white;color:var(--teal);border:2px solid var(--teal)}
+.btn-outline:hover{background:var(--sage-pale);transform:translateY(-2px)}
+.stats-bar{position:relative;z-index:1;display:flex;justify-content:center;gap:clamp(2rem,5vw,5rem);padding:2rem clamp(1.5rem,5vw,5rem);max-width:1100px;margin:0 auto 4rem;background:white;border-radius:var(--radius-lg);box-shadow:var(--shadow);flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-family:var(--font-h);font-size:2.2rem;color:var(--teal)}
+.stat-lbl{font-size:0.78rem;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.07em;margin-top:2px}
+.section{position:relative;z-index:1;padding:0 clamp(1.5rem,5vw,5rem) 5rem;max-width:1200px;margin:0 auto}
+.sec-tag{font-size:0.78rem;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem}
+.section h2{font-family:var(--font-h);font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:0.75rem}
+.section .sub{color:var(--text-soft);font-size:1rem;line-height:1.7;margin-bottom:3rem}
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem}
+.step-card{background:white;border-radius:var(--radius-lg);padding:2rem;box-shadow:0 4px 16px rgba(90,171,158,0.1);transition:0.3s;border:2px solid transparent;text-align:center}
+.step-card:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:var(--sage-light)}
+.step-icon{font-size:2.5rem;margin-bottom:1rem}
+.step-num{width:48px;height:48px;border-radius:50%;font-family:var(--font-h);font-size:1.3rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;color:white;background:linear-gradient(135deg,var(--sage),var(--teal))}
+.step-card h4{font-family:var(--font-h);font-size:1.05rem;margin-bottom:0.5rem}
+.step-card p{font-size:0.85rem;color:var(--text-soft);line-height:1.65}
+.portals-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-top:2.5rem}
+.portal-card{border-radius:var(--radius-lg);padding:2.5rem;text-align:center;cursor:pointer;transition:0.3s;text-decoration:none;display:block}
+.portal-card:hover{transform:translateY(-8px);box-shadow:0 20px 50px rgba(0,0,0,0.12)}
+.pc-user{background:linear-gradient(145deg,#e8f5eb,#d4f0df)}
+.pc-staff{background:linear-gradient(145deg,#d0eef8,#b8dff0)}
+.pc-admin{background:linear-gradient(145deg,#fde0cc,#fccfb0)}
+.portal-icon{font-size:3.5rem;margin-bottom:1rem;display:block}
+.portal-card h3{font-family:var(--font-h);font-size:1.3rem;margin-bottom:0.5rem;color:var(--text-dark)}
+.portal-card p{font-size:0.88rem;color:var(--text-mid);line-height:1.6;margin-bottom:1.5rem}
+.portal-btn{display:inline-block;padding:10px 24px;border-radius:50px;font-size:0.85rem;font-weight:700;color:white}
+.pc-user .portal-btn{background:var(--sage)}
+.pc-staff .portal-btn{background:var(--teal)}
+.pc-admin .portal-btn{background:#e08050}
+footer{position:relative;z-index:1;background:var(--text-dark);color:rgba(255,255,255,0.6);text-align:center;padding:2rem;font-size:0.82rem;line-height:1.8}
+footer strong{color:var(--mint)}
+</style>
+</head>
+<body>
+<div class="blob-bg"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+<nav>
+  <a class="nav-logo" href="index.html">
+    <div class="logo-icon">
+      <svg width="24" height="24" viewBox="0 0 40 40"><circle cx="19" cy="21" r="12" fill="white"/><line x1="19" y1="21" x2="19" y2="13" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round"/><line x1="19" y1="21" x2="25" y2="21" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round"/><circle cx="32" cy="9" r="7" fill="#7cb987"/><polyline points="28,9 31,12 37,5" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="logo-text">Queue<span>Bank</span> MS</div>
+  </a>
+  <div class="nav-links">
+    <a class="nav-a" href="index.html">Home</a>
+    <a class="nav-a" href="user.html">Book Now</a>
+    <a class="nav-a" href="staff.html">Staff</a>
+    <a class="nav-a" href="admin.html">Admin</a>
+    <a class="nav-a nav-cta" href="user.html">Reserve a Slot →</a>
+  </div>
+</nav>
+<section class="hero">
+  <div>
+    <div class="hero-tag"><span class="hero-dot"></span>Epoka University · DMAIC Project 2026</div>
+    <h1>Banking Without<br><em>the Wait.</em></h1>
+    <p>Reserve your exact bank appointment online. Walk in at your time — and walk out served. No queues, no stress.</p>
+    <div class="hero-btns">
+      <a class="btn btn-primary" href="user.html">📅 Book My Appointment</a>
+      <a class="btn btn-outline" href="user.html">View My Bookings</a>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:center;align-items:center">
+    <svg viewBox="0 0 460 380" style="width:100%;max-width:460px" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="230" cy="190" r="180" fill="#e8f5eb" opacity="0.7"/>
+      <rect x="60" y="230" width="340" height="80" rx="14" fill="#7cb987" opacity="0.9"/>
+      <rect x="55" y="222" width="350" height="18" rx="9" fill="#a8d5b0"/>
+      <circle cx="310" cy="178" r="25" fill="#fde0cc"/>
+      <ellipse cx="310" cy="162" rx="25" ry="11" fill="#a0704a"/>
+      <path d="M285 202 Q310 190 335 202 L340 290 H280 Z" fill="#5aab9e"/>
+      <circle cx="148" cy="175" r="24" fill="#fccfb0"/>
+      <ellipse cx="148" cy="159" rx="24" ry="10" fill="#5a3e28"/>
+      <path d="M124 198 Q148 186 172 198 L176 290 H120 Z" fill="#c9b8e8"/>
+      <rect x="248" y="192" width="50" height="32" rx="5" fill="#2d4a35"/>
+      <rect x="252" y="196" width="42" height="24" rx="3" fill="#85c9be"/>
+      <rect x="60" y="65" width="130" height="38" rx="19" fill="#5aab9e"/>
+      <text x="125" y="89" text-anchor="middle" font-family="Nunito" font-size="13" fill="white" font-weight="800">📅 Slot Reserved</text>
+      <rect x="310" y="110" width="120" height="38" rx="19" fill="#7cb987"/>
+      <text x="370" y="134" text-anchor="middle" font-family="Nunito" font-size="13" fill="white" font-weight="800">✓ No Waiting!</text>
+      <circle cx="380" cy="130" r="30" fill="white" stroke="#a8d5b0" stroke-width="2.5" opacity="0"/>
+    </svg>
+  </div>
+</section>
+<div style="position:relative;z-index:1;padding:0 clamp(1.5rem,5vw,5rem)">
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-num">0 min</div><div class="stat-lbl">Wait Time</div></div>
+    <div class="stat"><div class="stat-num">24/7</div><div class="stat-lbl">Online Booking</div></div>
+    <div class="stat"><div class="stat-num">6</div><div class="stat-lbl">Services</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">No Queuing</div></div>
+  </div>
+</div>
+<section class="section">
+  <div class="sec-tag">🌱 How It Works</div>
+  <h2>Four Steps to a <em style="font-style:normal;color:var(--teal)">Perfect Visit</em></h2>
+  <p class="sub">No app to download. No tokens. Just book online and arrive exactly when expected.</p>
+  <div class="steps-grid">
+    <div class="step-card"><div class="step-icon">🏦</div><div class="step-num">1</div><h4>Pick a Service</h4><p>Choose from account opening, loans, card services, transfers, investments, and more.</p></div>
+    <div class="step-card"><div class="step-icon">📅</div><div class="step-num">2</div><h4>Choose Your Slot</h4><p>Select any open date and time from our live calendar. See what is free instantly.</p></div>
+    <div class="step-card"><div class="step-icon">✍️</div><div class="step-num">3</div><h4>Enter Your Details</h4><p>Fill in your name and contact info. Get a unique QB-XXXXX confirmation code.</p></div>
+    <div class="step-card"><div class="step-icon">🎯</div><div class="step-num">4</div><h4>Arrive & Be Served</h4><p>Walk in at your reserved time. No waiting — staff are ready for you.</p></div>
+  </div>
+</section>
+<section class="section">
+  <div class="sec-tag">🔐 Access Portals</div>
+  <h2>Who Are You?</h2>
+  <p class="sub">Choose your portal below to get started.</p>
+  <div class="portals-grid">
+    <a class="portal-card pc-user" href="user.html">
+      <span class="portal-icon">👤</span>
+      <h3>I'm a Customer</h3>
+      <p>Book appointments, pick time slots, and manage your reservations easily online.</p>
+      <span class="portal-btn">Book Now →</span>
+    </a>
+    <a class="portal-card pc-staff" href="staff.html">
+      <span class="portal-icon">🧑‍💼</span>
+      <h3>I'm a Staff Member</h3>
+      <p>View today's appointments, mark completions, and manage no-shows in real time.</p>
+      <span class="portal-btn">Staff Login →</span>
+    </a>
+    <a class="portal-card pc-admin" href="admin.html">
+      <span class="portal-icon">⚙️</span>
+      <h3>I'm an Admin</h3>
+      <p>Manage the entire system — staff, services, all bookings, and analytics.</p>
+      <span class="portal-btn">Admin Panel →</span>
+    </a>
+  </div>
+</section>
+<footer>
+  <strong>QueueBank MS</strong> — Smart Bank Appointment Reservation System<br>
+  DMAIC Methodology Project · March–April 2026 · Epoka University, Albania<br>
+  Team: Amela Kondi · Ester Sino · Eriselda Boja
+</footer>
+</body>
+</html>

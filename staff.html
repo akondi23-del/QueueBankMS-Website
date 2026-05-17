@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QueueBank MS — Staff Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--sage:#7cb987;--teal:#5aab9e;--cream:#fdf8f0;--mint:#b8e8cc;--sage-pale:#e8f5eb;--sage-light:#a8d5b0;--sky:#d0eef8;--peach:#fde0cc;--text-dark:#2d4a35;--text-soft:#7a9e82;--text-mid:#4a7055;--shadow:0 8px 32px rgba(90,171,158,0.15);--radius:14px;--radius-lg:24px;--font-h:'Playfair Display',serif;--font-b:'Nunito',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-b);background:var(--cream);color:var(--text-dark);min-height:100vh}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:68px;background:rgba(253,248,240,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(124,185,135,0.2)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-text{font-family:var(--font-h);font-size:1.1rem;color:var(--text-dark)}
+.logo-text span{color:var(--teal)}
+.nav-links{display:flex;align-items:center;gap:8px}
+.nav-tab{display:flex;gap:2px;background:var(--sage-pale);border-radius:50px;padding:4px}
+.tab-btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-b);font-size:0.78rem;font-weight:800;padding:8px 16px;border-radius:50px;border:none;background:transparent;color:var(--text-soft);cursor:pointer;transition:0.2s;white-space:nowrap}
+.tab-btn.active{background:white;color:var(--teal);box-shadow:0 2px 8px rgba(90,171,158,0.15)}
+.tab-btn:hover{color:var(--teal)}
+.nav-a{font-size:0.85rem;font-weight:700;padding:8px 15px;border-radius:10px;color:var(--text-mid);text-decoration:none;transition:0.2s}
+.nav-a:hover{background:var(--sage-pale);color:var(--teal)}
+.staff-badge{background:var(--sky);color:var(--teal);border:2px solid #a8d8ea;padding:5px 14px;border-radius:50px;font-size:0.78rem;font-weight:800}
+.wrap{max-width:1100px;margin:0 auto;padding:2.5rem 2rem 5rem}
+.page{display:none}.page.active{display:block}
+.page-head{margin-bottom:2rem}
+.page-head h2{font-family:var(--font-h);font-size:1.8rem;margin-bottom:0.5rem}
+.page-head p{color:var(--text-soft);font-size:0.88rem}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:2rem}
+.kpi{background:white;border:2px solid #d4f0df;border-radius:var(--radius-lg);padding:1.2rem;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--sage),var(--teal))}
+.kpi h4{font-size:0.7rem;font-weight:800;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.5rem}
+.kpi-num{font-family:var(--font-h);font-size:1.8rem;color:var(--text-dark)}
+.kpi-sub{font-size:0.7rem;color:var(--text-soft);margin-top:2px}
+.table-wrap{background:white;border:2px solid #d4f0df;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:2rem}
+.tw-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:2px solid #d4f0df;flex-wrap:wrap;gap:0.75rem}
+.tw-head h3{font-family:var(--font-h);font-size:1rem}
+.search-inp{padding:8px 14px;border-radius:50px;border:2px solid #d4f0df;font-size:0.82rem;font-family:var(--font-b);outline:none;background:var(--cream);color:var(--text-dark);transition:0.2s}
+.search-inp:focus{border-color:var(--sage)}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 14px;font-size:0.68rem;font-weight:800;color:var(--text-soft);text-transform:uppercase;letter-spacing:0.07em;text-align:left;background:var(--sage-pale);border-bottom:2px solid var(--sage-light)}
+td{padding:12px 14px;font-size:0.83rem;border-bottom:1px solid rgba(168,213,176,0.25);vertical-align:middle}
+tr:hover td{background:rgba(232,245,235,0.5)}
+.badge{padding:4px 11px;border-radius:50px;font-size:0.7rem;font-weight:800;display:inline-block}
+.b-confirmed{background:#e8f5eb;color:var(--sage)}
+.b-completed{background:#d0eef8;color:#4080b0}
+.b-cancelled{background:#fde0cc;color:#c06040}
+.b-noshow{background:#fde8f0;color:#c06080}
+.act-btns{display:flex;gap:6px;flex-wrap:wrap}
+.abtn{font-family:var(--font-b);font-size:0.75rem;font-weight:800;padding:6px 12px;border-radius:50px;border:2px solid;cursor:pointer;transition:0.2s}
+.ab-done{border-color:var(--sage-light);color:var(--teal);background:var(--sage-pale)}
+.ab-done:hover{background:var(--mint)}
+.ab-ns{border-color:#f0c0d0;color:#c06080;background:#fde8f0}
+.ab-ns:hover{background:#f8d0e0}
+.profile-card{background:white;border:2px solid #d4f0df;border-radius:var(--radius-lg);padding:2rem;max-width:500px;margin-bottom:2rem}
+.profile-field{margin-bottom:1.5rem}
+.profile-field label{font-size:0.73rem;font-weight:800;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.5rem}
+.profile-value{font-size:1rem;color:var(--text-dark);padding:10px 14px;background:var(--sage-pale);border-radius:8px}
+#toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(16px);background:var(--text-dark);color:white;border-radius:50px;padding:12px 24px;font-size:0.85rem;font-weight:700;z-index:300;opacity:0;transition:0.3s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 68px)}
+.login-card{background:white;border:2px solid var(--sage-light);border-radius:var(--radius-lg);padding:3rem;width:min(440px,100%);box-shadow:var(--shadow);text-align:center}
+.login-card h2{font-family:var(--font-h);font-size:1.8rem;margin-bottom:0.5rem}
+.login-card p{color:var(--text-soft);font-size:0.9rem;margin-bottom:2rem;line-height:1.6}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;text-align:left}
+label{font-size:0.73rem;font-weight:800;color:var(--text-mid);letter-spacing:0.05em;text-transform:uppercase}
+input{background:var(--cream);border:2px solid #d4f0df;color:var(--text-dark);padding:11px 14px;border-radius:10px;font-size:0.9rem;font-family:var(--font-b);outline:none;transition:0.2s;width:100%}
+input:focus{border-color:var(--sage);background:white}
+.btn{font-family:var(--font-b);font-weight:800;font-size:0.9rem;padding:12px 26px;border-radius:50px;border:none;cursor:pointer;transition:0.2s;width:100%}
+.btn-primary{background:linear-gradient(135deg,var(--sage),var(--teal));color:white;box-shadow:0 4px 14px rgba(90,171,158,0.3)}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-logout{background:var(--peach);border:2px solid #f0c0a0;color:#c07040;padding:8px 20px;border-radius:50px;font-size:0.82rem;font-weight:800;cursor:pointer;font-family:var(--font-b);width:auto}
+.hint{font-size:0.74rem;color:var(--text-soft);margin-top:0.75rem}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="index.html">
+    <div style="width:38px;height:38px;background:linear-gradient(135deg,var(--sage),var(--teal));border-radius:11px;display:flex;align-items:center;justify-content:center">
+      <svg width="22" height="22" viewBox="0 0 40 40"><circle cx="19" cy="21" r="12" fill="white"/><line x1="19" y1="21" x2="19" y2="13" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round"/><line x1="19" y1="21" x2="25" y2="21" stroke="#2d6a4f" stroke-width="2.5" stroke-linecap="round"/><circle cx="32" cy="9" r="7" fill="#7cb987"/><polyline points="28,9 31,12 37,5" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="logo-text">Queue<span>Bank</span> MS</div>
+  </a>
+  <div class="nav-links">
+    <span class="staff-badge">👤 Staff Portal</span>
+    <a class="nav-a" href="user.html">User Portal</a>
+    <a class="nav-a" href="admin.html">Admin</a>
+    <a class="nav-a" href="index.html">← Home</a>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div id="login-wrap" class="login-wrap">
+  <div class="login-card">
+    <div style="font-size:3.5rem;margin-bottom:1rem">🧑‍💼</div>
+    <h2>Staff Login</h2>
+    <p>Enter your employee credentials to access the dashboard.</p>
+    <div class="fg"><label>Employee ID</label><input id="emp-id" placeholder="e.g. EMP001" value="EMP001"></div>
+    <div class="fg"><label>Password</label><input id="emp-pw" type="password" placeholder="Enter password" value="staff123"></div>
+    <button class="btn btn-primary" onclick="login()">🔐 Access Dashboard</button>
+    <p class="hint">Demo: EMP001 / staff123</p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash-wrap" class="wrap" style="display:none">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem">
+    <div>
+      <h2 style="font-family:var(--font-h);font-size:1.8rem">Staff Dashboard 🌱</h2>
+      <p style="color:var(--text-soft);font-size:0.88rem" id="staff-date"></p>
+    </div>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </div>
+
+  <!-- NAV TABS -->
+  <div class="nav-tab" style="margin-bottom:2rem">
+    <button class="tab-btn active" onclick="showPage('today',this)">📅 Today's Schedule</button>
+    <button class="tab-btn" onclick="showPage('pending',this)">⏳ Pending</button>
+    <button class="tab-btn" onclick="showPage('completed',this)">✓ Completed</button>
+    <button class="tab-btn" onclick="showPage('profile',this)">👤 My Profile</button>
+    <button class="tab-btn" onclick="showPage('stats',this)">📊 Performance</button>
+  </div>
+
+  <!-- TODAY'S SCHEDULE PAGE -->
+  <div id="page-today" class="page active">
+    <div class="page-head"><h2>Today's Schedule</h2><p>All appointments scheduled for today</p></div>
+    <div class="kpi-grid" id="today-kpi"></div>
+    <div class="table-wrap">
+      <div class="tw-head"><h3>Today's Appointments</h3></div>
+      <div style="overflow-x:auto">
+        <table><thead><tr><th>Code</th><th>Customer</th><th>Service</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="today-body"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PENDING PAGE -->
+  <div id="page-pending" class="page">
+    <div class="page-head"><h2>Pending Appointments</h2><p>Appointments waiting to be processed</p></div>
+    <div class="table-wrap">
+      <div class="tw-head"><h3>Pending Appointments</h3></div>
+      <div style="overflow-x:auto">
+        <table><thead><tr><th>Code</th><th>Customer</th><th>Service</th><th>Date</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="pending-body"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPLETED PAGE -->
+  <div id="page-completed" class="page">
+    <div class="page-head"><h2>Completed Appointments</h2><p>History of finished appointments</p></div>
+    <div class="kpi-grid" id="completed-kpi"></div>
+    <div class="table-wrap">
+      <div class="tw-head"><h3>Completed & No-shows</h3></div>
+      <div style="overflow-x:auto">
+        <table><thead><tr><th>Code</th><th>Customer</th><th>Service</th><th>Date</th><th>Status</th><th>Completed</th></tr></thead>
+        <tbody id="completed-body"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div id="page-profile" class="page">
+    <div class="page-head"><h2>My Profile</h2><p>Your staff information</p></div>
+    <div class="profile-card" id="profile-card"></div>
+  </div>
+
+  <!-- PERFORMANCE PAGE -->
+  <div id="page-stats" class="page">
+    <div class="page-head"><h2>Performance Dashboard</h2><p>Your appointment statistics</p></div>
+    <div class="kpi-grid" id="stats-kpi"></div>
+    <div class="table-wrap">
+      <div class="tw-head"><h3>Monthly Performance</h3></div>
+      <div style="overflow-x:auto">
+        <table><thead><tr><th>Metric</th><th>This Month</th><th>All Time</th></tr></thead>
+        <tbody id="stats-body"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'api';
+const ICONS = {bank:'🏦',loan:'💰',card:'💳',transfer:'💸',invest:'📈',support:'🛠️'};
+
+let bks = [], currentStaff = null, allBookings = [];
+
+async function login() {
+  const id = document.getElementById('emp-id').value.trim();
+  const pw = document.getElementById('emp-pw').value.trim();
+  if (!id || !pw) { toast('Please enter credentials'); return; }
+  try {
+    const r = await fetch(API + '/staff_login.php', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({employee_id:id,password:pw})});
+    const d = await r.json();
+    if (d.success) {
+      currentStaff = d.staff;
+      document.getElementById('login-wrap').style.display = 'none';
+      document.getElementById('dash-wrap').style.display = 'block';
+      setDate();
+      await loadBookings();
+      renderToday();
+      renderProfile();
+    } else {
+      toast(d.error || 'Invalid credentials');
+    }
+  } catch(e) {
+    toast('Connection error. Make sure XAMPP is running.');
+  }
+}
+
+function logout() {
+  document.getElementById('login-wrap').style.display = 'flex';
+  document.getElementById('dash-wrap').style.display = 'none';
+  currentStaff = null;
+}
+
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  
+  if (id === 'today') renderToday();
+  else if (id === 'pending') renderPending();
+  else if (id === 'completed') renderCompleted();
+  else if (id === 'stats') renderStats();
+}
+
+function setDate() {
+  document.getElementById('staff-date').textContent = new Date().toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+}
+
+async function loadBookings() {
+  try {
+    const r = await fetch(API + '/get_bookings.php');
+    const d = await r.json();
+    if (d.success) allBookings = d.bookings;
+  } catch(e) {}
+}
+
+function getTodayBookings() {
+  const today = new Date().toISOString().split('T')[0];
+  return allBookings.filter(b => b.date === today);
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+}
+
+function renderToday() {
+  const today = getTodayBookings();
+  const cf = today.filter(b => b.status === 'Confirmed').length;
+  const cp = today.filter(b => b.status === 'Completed').length;
+  const ns = today.filter(b => b.status === 'No-show').length;
+  
+  document.getElementById('today-kpi').innerHTML = `
+    <div class="kpi"><h4>Total Today</h4><div class="kpi-num">${today.length}</div><div class="kpi-sub">Appointments</div></div>
+    <div class="kpi"><h4>Pending</h4><div class="kpi-num">${cf}</div><div class="kpi-sub">To process</div></div>
+    <div class="kpi"><h4>Completed</h4><div class="kpi-num">${cp}</div><div class="kpi-sub">Today</div></div>
+    <div class="kpi"><h4>No-shows</h4><div class="kpi-num">${ns}</div><div class="kpi-sub">Today</div></div>`;
+  
+  const body = document.getElementById('today-body');
+  if (!today.length) { body.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-soft)">No appointments today</td></tr>`; return; }
+  body.innerHTML = today.map(b => `
+    <tr>
+      <td><strong style="color:var(--teal)">${b.code}</strong></td>
+      <td>${b.first_name} ${b.last_name}</td>
+      <td>${ICONS[b.service_icon]||'🏦'} ${b.service_name}</td>
+      <td><strong>${b.slot}</strong></td>
+      <td><span class="badge b-${b.status.toLowerCase().replace(/-/g,'')}">${b.status}</span></td>
+      <td>
+        <div class="act-btns">
+          ${b.status==='Confirmed'?`<button class="abtn ab-done" onclick="setStatus('${b.code}','Completed')">✓</button><button class="abtn ab-ns" onclick="setStatus('${b.code}','No-show')">✗</button>`:'—'}
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function renderPending() {
+  const pending = allBookings.filter(b => b.status === 'Confirmed');
+  const body = document.getElementById('pending-body');
+  if (!pending.length) { body.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--text-soft)">No pending appointments</td></tr>`; return; }
+  body.innerHTML = pending.map(b => `
+    <tr>
+      <td><strong style="color:var(--teal)">${b.code}</strong></td>
+      <td>${b.first_name} ${b.last_name}</td>
+      <td>${ICONS[b.service_icon]||'🏦'} ${b.service_name}</td>
+      <td>${fmtDate(b.date)}</td>
+      <td>${b.slot}</td>
+      <td><span class="badge b-confirmed">Confirmed</span></td>
+      <td>
+        <div class="act-btns">
+          <button class="abtn ab-done" onclick="setStatus('${b.code}','Completed')">✓ Done</button>
+          <button class="abtn ab-ns" onclick="setStatus('${b.code}','No-show')">✗ No-show</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function renderCompleted() {
+  const done = allBookings.filter(b => b.status === 'Completed' || b.status === 'No-show');
+  const cp = done.filter(b => b.status === 'Completed').length;
+  const ns = done.filter(b => b.status === 'No-show').length;
+  
+  document.getElementById('completed-kpi').innerHTML = `
+    <div class="kpi"><h4>Completed</h4><div class="kpi-num">${cp}</div><div class="kpi-sub">Served</div></div>
+    <div class="kpi"><h4>No-shows</h4><div class="kpi-num">${ns}</div><div class="kpi-sub">Missed</div></div>`;
+  
+  const body = document.getElementById('completed-body');
+  if (!done.length) { body.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-soft)">No completed appointments</td></tr>`; return; }
+  body.innerHTML = done.map(b => `
+    <tr>
+      <td><strong style="color:var(--teal)">${b.code}</strong></td>
+      <td>${b.first_name} ${b.last_name}</td>
+      <td>${ICONS[b.service_icon]||'🏦'} ${b.service_name}</td>
+      <td>${fmtDate(b.date)}</td>
+      <td><span class="badge b-${b.status.toLowerCase().replace(/-/g,'')}">${b.status}</span></td>
+      <td>${b.created_at ? new Date(b.created_at).toLocaleDateString('en-GB') : '—'}</td>
+    </tr>`).join('');
+}
+
+function renderProfile() {
+  if (!currentStaff) return;
+  document.getElementById('profile-card').innerHTML = `
+    <div class="profile-field">
+      <label>Name</label>
+      <div class="profile-value">${currentStaff.name}</div>
+    </div>
+    <div class="profile-field">
+      <label>Employee ID</label>
+      <div class="profile-value">${currentStaff.employee_id}</div>
+    </div>
+    <div class="profile-field">
+      <label>Role</label>
+      <div class="profile-value" style="color:var(--teal);font-weight:800">${currentStaff.role}</div>
+    </div>
+    <div class="profile-field">
+      <label>Email</label>
+      <div class="profile-value">${currentStaff.email}</div>
+    </div>
+    <div class="profile-field">
+      <label>Status</label>
+      <div class="profile-value" style="color:#2d7a4f;font-weight:800">${currentStaff.status}</div>
+    </div>`;
+}
+
+function renderStats() {
+  if (!currentStaff) return;
+  const all = allBookings.length;
+  const cp = allBookings.filter(b => b.status === 'Completed').length;
+  const ns = allBookings.filter(b => b.status === 'No-show').length;
+  const cf = allBookings.filter(b => b.status === 'Confirmed').length;
+  
+  document.getElementById('stats-kpi').innerHTML = `
+    <div class="kpi"><h4>Total Appointments</h4><div class="kpi-num">${all}</div><div class="kpi-sub">All time</div></div>
+    <div class="kpi"><h4>Completed</h4><div class="kpi-num">${cp}</div><div class="kpi-sub">Served</div></div>
+    <div class="kpi"><h4>No-shows</h4><div class="kpi-num">${ns}</div><div class="kpi-sub">Missed</div></div>
+    <div class="kpi"><h4>Completion Rate</h4><div class="kpi-num">${all ? Math.round((cp / all) * 100) : 0}%</div><div class="kpi-sub">Success</div></div>`;
+  
+  const body = document.getElementById('stats-body');
+  body.innerHTML = `
+    <tr><td>Total Appointments</td><td>${all}</td><td>${all}</td></tr>
+    <tr><td>Completed</td><td>${cp}</td><td>${cp}</td></tr>
+    <tr><td>No-shows</td><td>${ns}</td><td>${ns}</td></tr>
+    <tr><td>Confirmation Rate</td><td>${all ? Math.round((cf / all) * 100) : 0}%</td><td>${all ? Math.round((cf / all) * 100) : 0}%</td></tr>`;
+}
+
+async function setStatus(code, status) {
+  try {
+    const r = await fetch(API + '/update_status.php', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,status})});
+    const d = await r.json();
+    if (d.success) {
+      const b = allBookings.find(x => x.code === code);
+      if (b) b.status = status;
+      renderToday();
+      renderPending();
+      renderCompleted();
+      renderStats();
+      toast(`✅ ${code} marked as ${status}`);
+    } else toast(d.error || 'Failed');
+  } catch(e) { toast('Connection error'); }
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show';
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.className = '', 3000);
+}
+</script>
+</body>
+</html>
