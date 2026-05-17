@@ -5,7 +5,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $data   = json_decode(file_get_contents("php://input"), true);
 
 if ($method === 'POST') {
-    // Submit ticket
+
     $required = ['customer_name','email','subject','message'];
     foreach ($required as $f) {
         if (empty(trim($data[$f] ?? ''))) {
@@ -13,19 +13,19 @@ if ($method === 'POST') {
             exit;
         }
     }
-    // Validate email
+
     if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
         echo json_encode(["success" => false, "error" => "Invalid email format"]);
         exit;
     }
-    // Generate ticket ID
+
     $ticket_id = 'TK-' . strtoupper(substr(md5(uniqid()), 0, 5));
     $stmt = $pdo->prepare("INSERT INTO support_tickets (ticket_id, customer_name, email, subject, message) VALUES (?,?,?,?,?)");
     $stmt->execute([$ticket_id, $data['customer_name'], $data['email'], $data['subject'], $data['message']]);
     echo json_encode(["success" => true, "ticket_id" => $ticket_id]);
 
 } elseif ($method === 'GET') {
-    // Get all tickets (admin) or by email (customer)
+
     $email = $_GET['email'] ?? '';
     if ($email) {
         $stmt = $pdo->prepare("SELECT * FROM support_tickets WHERE email = ? ORDER BY created_at DESC");
@@ -37,7 +37,7 @@ if ($method === 'POST') {
     echo json_encode(["success" => true, "tickets" => $stmt->fetchAll()]);
 
 } elseif ($method === 'PUT') {
-    // Update ticket status (admin)
+
     $ticket_id = $data['ticket_id'] ?? '';
     $status    = $data['status']    ?? '';
     $allowed   = ['Open','In Progress','Resolved'];
